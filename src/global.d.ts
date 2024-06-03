@@ -1,4 +1,4 @@
-import { type envSchema } from "@/env";
+import { type envSchema } from "./env";
 import { type z } from "zod";
 
 declare global {

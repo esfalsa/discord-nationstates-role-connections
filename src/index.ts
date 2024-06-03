@@ -1,5 +1,5 @@
-import { validateEnv } from "@/env";
-import { Storage } from "@/storage";
+import { validateEnv } from "./env";
+import { Storage } from "./storage";
 import { API } from "@discordjs/core";
 import { REST } from "@discordjs/rest";
 import { serve } from "@hono/node-server";
@@ -10,7 +10,9 @@ import { NationStatesAPI } from "./nationstates";
 
 const app = new Hono();
 // const discordBot = new API(new REST().setToken(process.env.DISCORD_TOKEN));
-const discord = new API(new REST({ authPrefix: "Bearer" }));
+const discord = new API(
+  new REST({ authPrefix: "Bearer", hashLifetime: 60_000 }),
+);
 const nationstates = await NationStatesAPI.create(
   "discord-nationstates-role-connections/0.1.0 (by:Esfalsa)",
   process.env.NATIONSTATES_SECRET,
@@ -121,11 +123,7 @@ app.post("/linked-role", async (c) => {
     return c.text("Missing or invalid token", 403);
   }
 
-  const verification = await nationstates.verify(
-    String(nation),
-    String(checksum),
-    token,
-  );
+  const verification = await nationstates.verify(nation, checksum, token);
   if (!verification) {
     return c.text("NationStates verification failed", 403);
   }
@@ -191,13 +189,12 @@ app.get("/discord-oauth-callback", async (c) => {
   discord.users.updateApplicationRoleConnection(process.env.DISCORD_CLIENT_ID, {
     platform_name: "NationStates",
     platform_username: nation,
+    metadata: {},
   });
 
   return c.text("Role linked successfully", 200);
 });
 
-serve({
-  fetch: app.fetch,
-  port: 3000,
-});
-console.log("Server started at http://localhost:3000/");
+const port = Number(process.env.PORT || 3000);
+serve({ fetch: app.fetch, port });
+console.log(`Server started at http://localhost:${port}/`);

@@ -5,6 +5,9 @@
   "scripts": {
     "dev": "esno --env-file=.env --watch src/index.ts",
     "tunnel": "export $(cat .env | xargs) && lt -p 3000 -s $LOCALTUNNEL_SUBDOMAIN",
+    "build": "rollup -c",
+    "start": "node dist/index.mjs",
+    "start:local": "node --env-file=.env dist/index.mjs",
     "fmt": "prettier --write ."
   },
   "dependencies": {
@@ -17,13 +20,17 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.4.0",
-    "@types/node": "^20.11.17",
-    "eslint": "9.x",
+    "@rollup/plugin-commonjs": "^25.0.8",
+    "@rollup/plugin-node-resolve": "^15.2.3",
+    "@types/node": "^20.14.0",
+    "eslint": "~9.4.0",
     "eslint-config-prettier": "^9.1.0",
     "esno": "^4.7.0",
     "globals": "^15.3.0",
     "localtunnel": "^2.0.2",
     "prettier": "3.3.0",
+    "rollup": "^4.18.0",
+    "rollup-plugin-esbuild": "^6.1.1",
     "typescript-eslint": "8.0.0-alpha.24"
   },
   "engines": {
