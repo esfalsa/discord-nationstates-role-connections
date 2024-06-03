@@ -1,0 +1,24 @@
+diff --git a/dist/index.js b/dist/index.js
+index 9b06ed5af4dd6f0941fc9a3198e462bb337df035..53d4454b238300e994ee96c1427938747795a270 100644
+--- a/dist/index.js
++++ b/dist/index.js
+@@ -2002,6 +2002,7 @@ var OAuth2API = class {
+       headers: {
+         "Content-Type": "application/x-www-form-urlencoded"
+       },
++	  auth: false,
+       signal
+     });
+   }
+diff --git a/dist/index.mjs b/dist/index.mjs
+index 0a9988c89cc86e0c8dfdfafadd96e5970aac31fb..ec3318a1b6ae27bfabdbab779224be9fea76ec44 100644
+--- a/dist/index.mjs
++++ b/dist/index.mjs
+@@ -1974,6 +1974,7 @@ var OAuth2API = class {
+       headers: {
+         "Content-Type": "application/x-www-form-urlencoded"
+       },
++	  auth: false,
+       signal
+     });
+   }

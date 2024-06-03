@@ -1,0 +1,38 @@
+{
+  "name": "discord-nationstates-role-connections",
+  "version": "0.1.0",
+  "type": "module",
+  "scripts": {
+    "dev": "esno --env-file=.env --watch src/index.ts",
+    "tunnel": "export $(cat .env | xargs) && lt -p 3000 -s $LOCALTUNNEL_SUBDOMAIN",
+    "fmt": "prettier --write ."
+  },
+  "dependencies": {
+    "@discordjs/core": "^1.2.0",
+    "@discordjs/rest": "^2.3.0",
+    "@hono/node-server": "^1.11.2",
+    "dotenv": "^16.4.5",
+    "hono": "^4.4.2",
+    "zod": "^3.23.8"
+  },
+  "devDependencies": {
+    "@eslint/js": "^9.4.0",
+    "@types/node": "^20.11.17",
+    "eslint": "9.x",
+    "eslint-config-prettier": "^9.1.0",
+    "esno": "^4.7.0",
+    "globals": "^15.3.0",
+    "localtunnel": "^2.0.2",
+    "prettier": "3.3.0",
+    "typescript-eslint": "8.0.0-alpha.24"
+  },
+  "engines": {
+    "node": ">=22"
+  },
+  "packageManager": "pnpm@9.1.4+sha512.9df9cf27c91715646c7d675d1c9c8e41f6fce88246f1318c1aa6a1ed1aeb3c4f032fcdf4ba63cc69c4fe6d634279176b5358727d8f2cc1e65b65f43ce2f8bfb0",
+  "pnpm": {
+    "patchedDependencies": {
+      "@discordjs/core@1.2.0": "patches/@discordjs__core@1.2.0.patch"
+    }
+  }
+}
