@@ -1,18 +1,32 @@
 import { validateEnv } from "./env";
 import { Storage } from "./storage";
-import { API } from "@discordjs/core";
+import {
+  OAuth2API,
+  RoleConnectionsAPI,
+  UsersAPI,
+} from "@discordjs/core/http-only";
 import { REST } from "@discordjs/rest";
 import { serve } from "@hono/node-server";
 import { Hono } from "hono";
 import { getSignedCookie, setSignedCookie } from "hono/cookie";
 import { html } from "hono/html";
 import { NationStatesAPI } from "./nationstates";
+import { metadata, type MetadataRecords } from "./metadata";
 
 const app = new Hono();
-// const discordBot = new API(new REST().setToken(process.env.DISCORD_TOKEN));
-const discord = new API(
-  new REST({ authPrefix: "Bearer", hashLifetime: 60_000 }),
+const restBot = new REST({ hashLifetime: 60_000 }).setToken(
+  process.env.DISCORD_TOKEN,
 );
+const discordBot = {
+  restBot,
+  roleConnections: new RoleConnectionsAPI(restBot),
+};
+const rest = new REST({ authPrefix: "Bearer", hashLifetime: 60_000 });
+const discord = {
+  rest,
+  oauth2: new OAuth2API(rest),
+  users: new UsersAPI(rest),
+};
 const nationstates = await NationStatesAPI.create(
   "discord-nationstates-role-connections/0.1.0 (by:Esfalsa)",
   process.env.NATIONSTATES_SECRET,
@@ -21,10 +35,10 @@ const storage = new Storage();
 
 validateEnv();
 
-// await discordBot.roleConnections.updateMetadataRecords(
-//   process.env.DISCORD_CLIENT_ID,
-//   [],
-// );
+await discordBot.roleConnections.updateMetadataRecords(
+  process.env.DISCORD_CLIENT_ID,
+  metadata,
+);
 
 app.get("/", (c) => {
   return c.text("Hello, World!", 200);
@@ -124,7 +138,7 @@ app.post("/linked-role", async (c) => {
   }
 
   const verification = await nationstates.verify(nation, checksum, token);
-  if (!verification) {
+  if (!verification.success) {
     return c.text("NationStates verification failed", 403);
   }
 
@@ -132,6 +146,9 @@ app.post("/linked-role", async (c) => {
   storage.prune();
   storage.setStateData(state, {
     nation,
+    waMember: verification.waMember,
+    population: verification.population,
+    founded: verification.founded,
     expires: new Date(Date.now() + 5 * 60),
   });
 
@@ -183,13 +200,20 @@ app.get("/discord-oauth-callback", async (c) => {
 
   discord.rest.setToken(res.access_token);
 
-  const { nation } = storage.getStateData(state);
+  const data = storage.getStateData(state);
   storage.deleteStateData(state);
 
   discord.users.updateApplicationRoleConnection(process.env.DISCORD_CLIENT_ID, {
     platform_name: "NationStates",
-    platform_username: nation,
-    metadata: {},
+    platform_username: data.nation,
+    metadata: {
+      date_founded:
+        typeof data.founded === "string" ?
+          data.founded
+        : new Date(data.founded * 1000).toISOString(),
+      population: data.population.toString(),
+      wa_member: data.waMember.toString(),
+    } satisfies MetadataRecords,
   });
 
   return c.text("Role linked successfully", 200);

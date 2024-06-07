@@ -6,7 +6,7 @@ settings:
 
 patchedDependencies:
   '@discordjs/core@1.2.0':
-    hash: fqzwtmacd3flaxsyl7j6djhsly
+    hash: hlysnx5iioioiye5qhqeab4l24
     path: patches/@discordjs__core@1.2.0.patch
 
 importers:
@@ -15,7 +15,7 @@ importers:
     dependencies:
       '@discordjs/core':
         specifier: ^1.2.0
-        version: 1.2.0(patch_hash=fqzwtmacd3flaxsyl7j6djhsly)
+        version: 1.2.0(patch_hash=hlysnx5iioioiye5qhqeab4l24)
       '@discordjs/rest':
         specifier: ^2.3.0
         version: 2.3.0
@@ -1102,7 +1102,7 @@ snapshots:
 
   '@discordjs/collection@2.1.0': {}
 
-  '@discordjs/core@1.2.0(patch_hash=fqzwtmacd3flaxsyl7j6djhsly)':
+  '@discordjs/core@1.2.0(patch_hash=hlysnx5iioioiye5qhqeab4l24)':
     dependencies:
       '@discordjs/rest': 2.3.0
       '@discordjs/util': 1.1.0

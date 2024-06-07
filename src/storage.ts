@@ -4,6 +4,9 @@ type StorageData = {
 
 type StateData = StorageData & {
   nation: string;
+  waMember: boolean;
+  population: number;
+  founded: string | number;
 };
 
 export class Storage {

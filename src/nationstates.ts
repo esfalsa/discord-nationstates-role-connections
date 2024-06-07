@@ -43,13 +43,13 @@ export class NationStatesAPI {
   }
 
   async verify(nation: string, checksum: string, token: string) {
-    // const token = await this.generateToken(nation);
     const endpoint = new URL(NationStatesAPI.baseURL);
     endpoint.search = new URLSearchParams({
       a: "verify",
       nation,
       checksum,
       token,
+      q: ["wa", "population", "firstlogin"].join("+"),
     }).toString();
     const res = await fetch(endpoint, {
       headers: {
@@ -58,6 +58,21 @@ export class NationStatesAPI {
     });
     const text = await res.text();
 
-    return text.trim() === "1";
+    if (text.includes("<VERIFY>1</VERIFY>")) {
+      return {
+        success: true as const,
+        waMember:
+          text.match(/(?<=<UNSTATUS>).+(?=<\/UNSTATUS>)/)?.[0] !== "Non-member",
+        population:
+          Number(
+            text.match(/(?<=<POPULATION>).+(?=<\/POPULATION>)/)?.[0] ?? "0",
+          ) * 1_000_000,
+        founded:
+          Number(text.match(/(?<=<FIRSTLOGIN>).+(?=<\/FIRSTLOGIN>)/)?.[0]) ||
+          "Antiquity",
+      };
+    } else {
+      return { success: false as const };
+    }
   }
 }

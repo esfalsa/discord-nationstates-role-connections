@@ -1,5 +1,29 @@
+diff --git a/dist/http-only.js b/dist/http-only.js
+index f2eb8a3896f88befb48961683bb552a9eef6e95e..bafa243518d64aeacc67d3f743239c0d687cd96f 100644
+--- a/dist/http-only.js
++++ b/dist/http-only.js
+@@ -2001,6 +2001,7 @@ var OAuth2API = class {
+       headers: {
+         "Content-Type": "application/x-www-form-urlencoded"
+       },
++	  auth: false,
+       signal
+     });
+   }
+diff --git a/dist/http-only.mjs b/dist/http-only.mjs
+index 757007a881cc0667768b598851060e658e161874..2809640f0bc48764c35315c6515c2cb01bd9151b 100644
+--- a/dist/http-only.mjs
++++ b/dist/http-only.mjs
+@@ -1974,6 +1974,7 @@ var OAuth2API = class {
+       headers: {
+         "Content-Type": "application/x-www-form-urlencoded"
+       },
++	  auth: false,
+       signal
+     });
+   }
 diff --git a/dist/index.js b/dist/index.js
-index 9b06ed5af4dd6f0941fc9a3198e462bb337df035..53d4454b238300e994ee96c1427938747795a270 100644
+index 9b06ed5af4dd6f0941fc9a3198e462bb337df035..ccf7d534f703894c7613b12fd62d47e154cae946 100644
 --- a/dist/index.js
 +++ b/dist/index.js
 @@ -2002,6 +2002,7 @@ var OAuth2API = class {
@@ -11,7 +35,7 @@ index 9b06ed5af4dd6f0941fc9a3198e462bb337df035..53d4454b238300e994ee96c142793874
      });
    }
 diff --git a/dist/index.mjs b/dist/index.mjs
-index 0a9988c89cc86e0c8dfdfafadd96e5970aac31fb..ec3318a1b6ae27bfabdbab779224be9fea76ec44 100644
+index 0a9988c89cc86e0c8dfdfafadd96e5970aac31fb..cb259255242e46c1cf925dffdaa68b237e5ac3a8 100644
 --- a/dist/index.mjs
 +++ b/dist/index.mjs
 @@ -1974,6 +1974,7 @@ var OAuth2API = class {
