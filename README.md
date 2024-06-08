@@ -15,7 +15,7 @@ pnpm dev
 
 You can optionally also set `LOCALTUNNEL_SUBDOMAIN` and use `pnpm tunnel` during development to request a specific domain from [Localtunnel](https://github.com/localtunnel/localtunnel), a free service to proxy web traffic to a service running locally on your server. This is only useful if you want to test the application with another user. While Discord's [official example](https://github.com/discord/linked-roles-sample) for a linked role app claims you need a public endpoint, if you're just testing yourself, a localhost URL works fine.
 
-## Building
+## Deploying
 
 ### From source
 
@@ -29,9 +29,12 @@ node --env-file=.env dist/index.mjs
 
 ### Docker
 
-A pre-built docker image is coming soon! In the meantime, you can build an image from the [Dockerfile](./Dockerfile) in this repository.
+```sh
+docker pull ghcr.io/esfalsa/discord-nationstates-role-connections:latest
+docker run --env-file=.env -dp 3000:3000 discord-nationstates-role-connections
+```
 
-## Deploying
+## Configuration
 
 You will need to create a new application in the [Discord developer portal](https://discord.com/developers/applications), and set the linked roles verification URL to the path `/linked-role` on your domain. Then, set the following required environment variables:
 
