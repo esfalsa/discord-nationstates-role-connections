@@ -6,7 +6,6 @@ export const envSchema = z.object({
   DISCORD_CLIENT_SECRET: z.string(),
   DISCORD_REDIRECT_URI: z.string(),
   COOKIE_SECRET: z.string(),
-  LOCALTUNNEL_SUBDOMAIN: z.string(),
   NATIONSTATES_SECRET: z.string(),
 });
 
