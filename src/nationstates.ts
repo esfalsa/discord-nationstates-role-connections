@@ -49,7 +49,7 @@ export class NationStatesAPI {
       nation,
       checksum,
       token,
-      q: ["wa", "population", "firstlogin"].join("+"),
+      q: ["name", "wa", "population", "firstlogin"].join("+"),
     }).toString();
     const res = await fetch(endpoint, {
       headers: {
@@ -58,9 +58,10 @@ export class NationStatesAPI {
     });
     const text = await res.text();
 
-    if (text.includes("<VERIFY>1</VERIFY>")) {
+    if (text.includes("<VERIFY>1</VERIFY>") && text.includes("<NAME>")) {
       return {
         success: true as const,
+        name: text.match(/(?<=<NAME>).+(?=<\/NAME>)/)![0],
         waMember:
           text.match(/(?<=<UNSTATUS>).+(?=<\/UNSTATUS>)/)?.[0] !== "Non-member",
         population:

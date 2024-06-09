@@ -165,6 +165,7 @@ app.post("/verify", async (c) => {
   storage.prune();
   storage.setStateData(state, {
     nation,
+    name: verification.name,
     waMember: verification.waMember,
     population: verification.population,
     founded: verification.founded,
@@ -236,7 +237,7 @@ app.get("/discord-oauth-callback", async (c) => {
 
   discord.users.updateApplicationRoleConnection(process.env.DISCORD_CLIENT_ID, {
     platform_name: "NationStates",
-    platform_username: data.nation,
+    platform_username: data.name,
     metadata: {
       date_founded:
         typeof data.founded === "string" ?

@@ -3,7 +3,14 @@ type StorageData = {
 };
 
 type StateData = StorageData & {
+  /**
+   * The name of the nation, in lowercase and without underscores
+   */
   nation: string;
+  /**
+   * The name of the nation, with original capitalization and spaces
+   */
+  name: string;
   waMember: boolean;
   population: number;
   founded: string | number;
