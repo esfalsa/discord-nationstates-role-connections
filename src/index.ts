@@ -12,6 +12,7 @@ import { getSignedCookie, setSignedCookie } from "hono/cookie";
 import { html } from "hono/html";
 import { NationStatesAPI } from "./nationstates";
 import { metadata, type MetadataRecords } from "./metadata";
+import { layout } from "./layout";
 
 const app = new Hono();
 const restBot = new REST({ hashLifetime: 60_000 }).setToken(
@@ -40,34 +41,40 @@ await discordBot.roleConnections.updateMetadataRecords(
   metadata,
 );
 
+app.use("/*", layout);
+
 app.get("/", (c) => {
-  return c.text("Hello, World!", 200);
+  return c.render(
+    html`<h1>Discord NationStates Role Connections</h1>
+      <p>
+        To get started linking your NationStates nation to your Discord account,
+        head <a href="./verify">here</a>.
+      </p>`,
+  );
 });
 
-app.get("/linked-role", async (c) => {
+app.get("/verify", async (c) => {
   const { nation } = c.req.query();
 
   if (!nation) {
-    return c.html(
-      html`<!doctype html>
-        <html lang="en">
-          <head>
-            <meta charset="UTF-8" />
-            <meta
-              name="viewport"
-              content="width=device-width, initial-scale=1.0"
-            />
-            <title>Link Your NationStates Nation</title>
-          </head>
-          <body>
-            <form>
-              <label for="nation">Nation:</label>
-              <input type="text" id="nation" name="nation" required />
-
-              <button type="submit">Submit</button>
-            </form>
-          </body>
-        </html>`,
+    return c.render(
+      html`<h1>Link Your NationStates Nation</h1>
+        <form method="GET">
+          <label for="nation">Nation</label>
+          <input
+            type="text"
+            name="nation"
+            id="nation"
+            placeholder="Testlandia"
+            required
+          />
+          <p>
+            <button type="submit">Submit</button>
+          </p>
+        </form>`,
+      {
+        title: "Link Your NationStates Nation",
+      },
     );
   }
 
@@ -81,65 +88,77 @@ app.get("/linked-role", async (c) => {
     secure: true,
   });
 
-  return c.html(
-    html`<!doctype html>
-      <html lang="en">
-        <head>
-          <meta charset="UTF-8" />
-          <meta
-            name="viewport"
-            content="width=device-width, initial-scale=1.0"
-          />
-          <title>Link Your NationStates Nation</title>
-        </head>
-        <body>
-          <form method="POST">
-            <label for="nation">Nation:</label>
-            <input
-              type="text"
-              id="nation"
-              name="nation"
-              required
-              value="${nation}"
-            />
+  return c.render(
+    html`<h1>Link Your NationStates Nation</h1>
+      <form method="POST">
+        <label for="nation">Nation</label>
+        <input
+          type="text"
+          id="nation"
+          name="nation"
+          required
+          value="${nation}"
+        />
 
-            <p>
-              To find your checksum, visit
-              <a href="${verificationURL}">this page</a>.
-            </p>
+        <label for="checksum">Checksum</label>
+        <input type="text" id="checksum" name="checksum" required />
 
-            <label for="checksum">Checksum:</label>
-            <input type="text" id="checksum" name="checksum" required />
+        <p>
+          To find your checksum, open
+          <a target="_blank" rel="noopener noreferrer" href="${verificationURL}"
+            >this page</a
+          >
+          and copy-paste the verification code. This is a one-time use link.
+        </p>
 
-            <button type="submit">Submit</button>
-          </form>
-        </body>
-      </html>`,
+        <button type="submit">Submit</button>
+      </form>`,
+    { title: "Link Your NationStates Nation" },
   );
 });
 
-app.post("/linked-role", async (c) => {
+app.post("/verify", async (c) => {
   const contentType = c.req.header("content-type");
   if (contentType !== "application/x-www-form-urlencoded") {
-    return c.text("Invalid content type", 415);
+    return c.render(
+      html`<h1>An Error Occurred</h1>
+        <p>Invalid content type</p>`,
+      { title: "Invalid content type", status: 415 },
+    );
   }
 
   const { nation, checksum } = await c.req.parseBody();
   if (!nation || !checksum) {
-    return c.text("Missing nation or checksum", 400);
+    return c.render(
+      html`<h1>An Error Occurred</h1>
+        <p>Missing nation or checksum</p>`,
+      { title: "Missing nation or checksum", status: 400 },
+    );
   }
   if (typeof nation !== "string" || typeof checksum !== "string") {
-    return c.text("Invalid nation or checksum", 400);
+    return c.render(
+      html`<h1>An Error Occurred</h1>
+        <p>Invalid nation or checksum</p>`,
+      { title: "Invalid nation or checksum", status: 400 },
+    );
   }
 
   const token = await getSignedCookie(c, process.env.COOKIE_SECRET, "nsToken");
   if (!token) {
-    return c.text("Missing or invalid token", 403);
+    return c.render(
+      html`<h1>An Error Occurred</h1>
+        <p>Missing or invalid token</p>`,
+      { title: "Missing or invalid token", status: 403 },
+    );
   }
 
   const verification = await nationstates.verify(nation, checksum, token);
   if (!verification.success) {
-    return c.text("NationStates verification failed", 403);
+    return c.render(
+      html`<h1>An Error Occurred</h1>
+        <p>NationStates verification failed</p>`,
+      { title: "NationStates verification failed", status: 403 },
+    );
   }
 
   const state = crypto.randomUUID();
@@ -173,12 +192,20 @@ app.post("/linked-role", async (c) => {
 app.get("/discord-oauth-callback", async (c) => {
   const code = c.req.query("code");
   if (!code) {
-    return c.text("Missing authorization code", 400);
+    return c.render(
+      html`<h1>An Error Occurred</h1>
+        <p>Missing authorization code</p>`,
+      { title: "Missing authorization code", status: 400 },
+    );
   }
 
   const state = c.req.query("state");
   if (!state) {
-    return c.text("Missing state", 400);
+    return c.render(
+      html`<h1>An Error Occurred</h1>
+        <p>Missing state</p>`,
+      { title: "Missing state", status: 400 },
+    );
   }
 
   const clientState = await getSignedCookie(
@@ -187,7 +214,11 @@ app.get("/discord-oauth-callback", async (c) => {
     "clientState",
   );
   if (clientState !== state) {
-    return c.text("State verification failed", 403);
+    return c.render(
+      html`<h1>An Error Occurred</h1>
+        <p>State verification failed</p>`,
+      { title: "State verification failed", status: 403 },
+    );
   }
 
   const res = await discord.oauth2.tokenExchange({
@@ -216,7 +247,15 @@ app.get("/discord-oauth-callback", async (c) => {
     } satisfies MetadataRecords,
   });
 
-  return c.text("Role linked successfully", 200);
+  return c.render(
+    html`<h1>Role Linked Successfully</h1>
+      <p>
+        Your NationStates nation has been linked to your Discord account, and
+        the information associated with your Discord account has been updated.
+        You can now return to Discord. You may still need to link any roles
+        requiring a NationStates connection.
+      </p>`,
+  );
 });
 
 const port = Number(process.env.PORT || 3000);

@@ -36,7 +36,7 @@ docker run --env-file=.env -dp 3000:3000 discord-nationstates-role-connections
 
 ## Configuration
 
-You will need to create a new application in the [Discord developer portal](https://discord.com/developers/applications), and set the linked roles verification URL to the path `/linked-role` on your domain. Then, set the following required environment variables:
+You will need to create a new application in the [Discord developer portal](https://discord.com/developers/applications), and set the linked roles verification URL to the path `/verify` on your domain. Then, set the following required environment variables:
 
 ```env
 DISCORD_TOKEN=...
